@@ -1,0 +1,46 @@
+@baseUrl = http://localhost:8080/api
+
+### 1. 新增意向客户
+POST {{baseUrl}}/leads
+Content-Type: application/json
+
+{
+  "name": "张三",
+  "phone": "13800000001",
+  "source": "抖音",
+  "status": "新建",
+  "owner": "顾问A"
+}
+
+### 2. 意向客户转学员
+POST {{baseUrl}}/leads/1/convert?idCard=110101199001011234
+
+### 3. 新增考场
+POST {{baseUrl}}/exam-sites
+Content-Type: application/json
+
+{
+  "name": "海淀考试中心",
+  "address": "北京市海淀区XX路100号",
+  "latitude": "39.984",
+  "longitude": "116.318",
+  "routeGuide": "地铁10号线xx站下车后步行600米"
+}
+
+### 4. 新增报考
+POST {{baseUrl}}/exam-applications
+Content-Type: application/json
+
+{
+  "studentId": 1,
+  "subjectCode": "K1",
+  "examSiteId": 1,
+  "examDate": "2026-05-10",
+  "status": "已申请"
+}
+
+### 5. 查询总览报表
+GET {{baseUrl}}/reports/overview
+
+### 6. 查询漏斗报表
+GET {{baseUrl}}/reports/funnel
