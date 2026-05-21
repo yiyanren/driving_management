@@ -20,7 +20,7 @@ public class LeadController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('管理员','招生')")
+    @PreAuthorize("hasAnyRole('管理员','招生','教练')")
     public ApiResponse<PageResult<Lead>> list(@RequestParam(defaultValue = "0") int page,
                                               @RequestParam(defaultValue = "10") int size,
                                               @RequestParam(required = false) String keyword,
@@ -29,7 +29,7 @@ public class LeadController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('管理员','招生')")
+    @PreAuthorize("hasAnyRole('管理员','招生','教练')")
     public ApiResponse<Lead> get(@PathVariable Long id) {
         return ApiResponse.ok(leadService.get(id));
     }

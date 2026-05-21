@@ -33,8 +33,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 Claims claims = jwtUtil.parseToken(token);
                 String username = claims.getSubject();
                 String role = String.valueOf(claims.get("role"));
+                
+                // 如果生成的 role 已经是 ROLE_ 开头，则不再重复拼接
+                String authorityStr = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+                
                 UsernamePasswordAuthenticationToken authenticationToken =
-                        new UsernamePasswordAuthenticationToken(username, null, List.of(new SimpleGrantedAuthority("ROLE_" + role)));
+                        new UsernamePasswordAuthenticationToken(username, null, List.of(new SimpleGrantedAuthority(authorityStr)));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             } catch (Exception ignored) {
                 SecurityContextHolder.clearContext();

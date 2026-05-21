@@ -16,10 +16,9 @@ public class ExamSite {
     @NotBlank(message = "不能为空")
     private String address;
 
-    private String latitude;
-    private String longitude;
-    private String routeGuide;
-    private String sessionName;
+    private String subjectType;
+    private String vehicleTypes;
+    private String regionName;
     private Integer capacity;
     private Integer reservedCount;
 
@@ -47,36 +46,28 @@ public class ExamSite {
         this.address = address;
     }
 
-    public String getLatitude() {
-        return latitude;
+    public String getSubjectType() {
+        return subjectType;
     }
 
-    public void setLatitude(String latitude) {
-        this.latitude = latitude;
+    public void setSubjectType(String subjectType) {
+        this.subjectType = subjectType;
     }
 
-    public String getLongitude() {
-        return longitude;
+    public String getVehicleTypes() {
+        return vehicleTypes;
     }
 
-    public void setLongitude(String longitude) {
-        this.longitude = longitude;
+    public void setVehicleTypes(String vehicleTypes) {
+        this.vehicleTypes = vehicleTypes;
     }
 
-    public String getRouteGuide() {
-        return routeGuide;
+    public String getRegionName() {
+        return regionName;
     }
 
-    public void setRouteGuide(String routeGuide) {
-        this.routeGuide = routeGuide;
-    }
-
-    public String getSessionName() {
-        return sessionName;
-    }
-
-    public void setSessionName(String sessionName) {
-        this.sessionName = sessionName;
+    public void setRegionName(String regionName) {
+        this.regionName = regionName;
     }
 
     public Integer getCapacity() {

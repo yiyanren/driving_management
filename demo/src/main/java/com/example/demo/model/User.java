@@ -24,6 +24,7 @@ public class User {
 
     private String displayName;
     private Boolean enabled;
+    private Long drivingSchoolId;
     private LocalDateTime createdAt;
 
     @PrePersist
@@ -76,5 +77,13 @@ public class User {
 
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public Long getDrivingSchoolId() {
+        return drivingSchoolId;
+    }
+
+    public void setDrivingSchoolId(Long drivingSchoolId) {
+        this.drivingSchoolId = drivingSchoolId;
     }
 }

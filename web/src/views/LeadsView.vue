@@ -8,10 +8,8 @@ const list = ref([]);
 const total = ref(0);
 const query = reactive({ page: 0, size: 10, keyword: "", status: "" });
 const leadForm = reactive({ name: "", phone: "", source: "", status: "新建", owner: "" });
-const convertForm = reactive({ leadId: "", idCard: "" });
 
 const columns = [
-  { title: "ID", dataIndex: "id", key: "id", width: 80 },
   { title: "姓名", dataIndex: "name", key: "name" },
   { title: "手机号", dataIndex: "phone", key: "phone" },
   { title: "来源", dataIndex: "source", key: "source" },
@@ -40,16 +38,6 @@ const createLead = async () => {
   loadData();
 };
 
-const convertLead = async () => {
-  if (!convertForm.leadId || !convertForm.idCard) return message.warning("请填写意向客户ID和身份证号");
-  const res = await api.convertLead(convertForm.leadId, convertForm.idCard);
-  if (!res.data.success) return message.error(res.data.message || "转换失败");
-  message.success("转换成功");
-  convertForm.leadId = "";
-  convertForm.idCard = "";
-  loadData();
-};
-
 onMounted(loadData);
 </script>
 
@@ -70,13 +58,6 @@ onMounted(loadData);
         <a-col :xs="24" :sm="12" :lg="6"><a-input v-model:value="leadForm.owner" placeholder="招生人员" /></a-col>
       </a-row>
       <a-button style="margin-top:12px;" type="primary" @click="createLead">新增意向客户</a-button>
-    </a-card>
-    <a-card title="意向客户转学员">
-      <a-row :gutter="12">
-        <a-col :xs="24" :sm="12"><a-input v-model:value="convertForm.leadId" placeholder="意向客户ID" /></a-col>
-        <a-col :xs="24" :sm="12"><a-input v-model:value="convertForm.idCard" placeholder="身份证号" /></a-col>
-      </a-row>
-      <a-button style="margin-top:12px;" type="primary" @click="convertLead">新增</a-button>
     </a-card>
     <a-card title="意向客户列表">
       <a-table

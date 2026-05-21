@@ -44,12 +44,17 @@
 ## 考场与报考
 - `GET /exam-sites?page=0&size=10&keyword=` 考场分页
 - `GET /exam-sites/{id}` 详情
-- `POST /exam-sites` 新建考场（支持容量/场次）
+- `POST /exam-sites` 新建考场（基础字段参考真实考场表：考试场地、科目类型、可考车型、地址）
+- `POST /exam-sites/import` 导入真实考场 Excel（参数：`file`、`defaultCapacity`）
+- `POST /exam-sites/import-local?defaultCapacity=30` 直接读取服务端本地 `考场信息表.xlsx`
+- `POST /exam-sites/schedules` 保存某日某科目考场日程容量
+- `GET /exam-sites/realtime?examDate=&subjectCode=&regionName=&keyword=&onlyAvailable=` 按日期/科目/区域实时查询考场容量、剩余名额
+- `GET /exam-sites/trend?siteId=&subjectCode=&from=&to=` 查询某考场预约趋势
 - `PUT /exam-sites/{id}` 更新考场
 - `DELETE /exam-sites/{id}` 删除考场
 - `GET /exam-applications?page=0&size=10&studentId=&status=` 报考分页
 - `GET /exam-applications/{id}` 报考详情
-- `POST /exam-applications` 提交报考（含容量校验）
+- `POST /exam-applications` 提交报考（含考场默认容量校验 + 按日期/科目日程余位校验）
 - `PATCH /exam-applications/{id}/status?status=已通过` 报考审核
 
 ## 报表（管理员/招生）

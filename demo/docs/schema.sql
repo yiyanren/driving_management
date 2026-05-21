@@ -46,13 +46,35 @@ CREATE TABLE IF NOT EXISTS training_record (
 CREATE TABLE IF NOT EXISTS exam_site (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(64) NOT NULL,
+    subject_type VARCHAR(64),
+    vehicle_types VARCHAR(128),
+    region_name VARCHAR(64),
     address VARCHAR(255) NOT NULL,
-    latitude VARCHAR(32),
-    longitude VARCHAR(32),
-    route_guide VARCHAR(500),
-    session_name VARCHAR(64),
     capacity INT,
     reserved_count INT
+);
+
+CREATE TABLE IF NOT EXISTS exam_site_schedule (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    exam_site_id BIGINT NOT NULL,
+    exam_date DATE NOT NULL,
+    subject_code VARCHAR(16) NOT NULL,
+    total_capacity INT NOT NULL,
+    reserved_count INT NOT NULL,
+    remaining_count INT NOT NULL,
+    sync_time DATETIME,
+    UNIQUE KEY uk_exam_site_schedule (exam_site_id, exam_date, subject_code)
+);
+
+CREATE TABLE IF NOT EXISTS exam_site_capacity_snapshot (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    exam_site_id BIGINT NOT NULL,
+    exam_date DATE NOT NULL,
+    subject_code VARCHAR(16) NOT NULL,
+    total_capacity INT NOT NULL,
+    reserved_count INT NOT NULL,
+    remaining_count INT NOT NULL,
+    snapshot_time DATETIME
 );
 
 CREATE TABLE IF NOT EXISTS exam_application (

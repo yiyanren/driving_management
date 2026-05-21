@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 @Service
@@ -19,13 +20,16 @@ public class ExamApplicationService {
     private final ExamApplicationRepository examApplicationRepository;
     private final StudentRepository studentRepository;
     private final ExamSiteRepository examSiteRepository;
+    private final ExamSiteService examSiteService;
 
     public ExamApplicationService(ExamApplicationRepository examApplicationRepository,
                                   StudentRepository studentRepository,
-                                  ExamSiteRepository examSiteRepository) {
+                                  ExamSiteRepository examSiteRepository,
+                                  ExamSiteService examSiteService) {
         this.examApplicationRepository = examApplicationRepository;
         this.studentRepository = studentRepository;
         this.examSiteRepository = examSiteRepository;
+        this.examSiteService = examSiteService;
     }
 
     public PageResult<ExamApplication> page(int page, int size, Long studentId, String status) {
@@ -47,6 +51,7 @@ public class ExamApplicationService {
         return examApplicationRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("报考记录不存在"));
     }
 
+    @Transactional
     public ExamApplication create(ExamApplication examApplication) {
         validateForeignKey(examApplication.getStudentId(), examApplication.getExamSiteId());
         ExamSite site = examSiteRepository.findById(examApplication.getExamSiteId())
@@ -56,6 +61,7 @@ public class ExamApplicationService {
         if (cap > 0 && used >= cap) {
             throw new IllegalArgumentException("考场场次容量已满");
         }
+        examSiteService.consumeScheduleCapacity(examApplication.getExamSiteId(), examApplication.getExamDate(), examApplication.getSubjectCode());
         site.setReservedCount(used + 1);
         examSiteRepository.save(site);
         if (!StringUtils.hasText(examApplication.getStatus())) {
