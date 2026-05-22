@@ -62,16 +62,9 @@ export const api = {
   deleteStudent: (id) => http.delete(`/students/${id}`),
   listExamSites: (params) => http.get("/exam-sites", { params }),
   createExamSite: (data) => http.post("/exam-sites", data),
-  importExamSites: (formData, defaultCapacity) => http.post("/exam-sites/import", formData, {
-    params: defaultCapacity === undefined ? undefined : { defaultCapacity },
+  importExamSites: (formData) => http.post("/exam-sites/import", formData, {
     headers: { "Content-Type": "multipart/form-data" }
   }),
-  importLocalExamSites: (defaultCapacity) => http.post("/exam-sites/import-local", null, {
-    params: { defaultCapacity }
-  }),
-  saveExamSiteSchedule: (data) => http.post("/exam-sites/schedules", data),
-  listRealtimeExamSites: (params) => http.get("/exam-sites/realtime", { params }),
-  getExamSiteTrend: (params) => http.get("/exam-sites/trend", { params }),
   listPlans: (params) => http.get("/teaching/plans", { params }),
   createPlan: (data) => http.post("/teaching/plans", data),
   updatePlanStatus: (id, status) => http.patch(`/teaching/plans/${id}/status`, null, { params: { status } }),

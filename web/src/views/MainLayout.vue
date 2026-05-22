@@ -50,7 +50,7 @@ const allMenus = [
     ]
   },
   { key: "/teaching", icon: () => h(ScheduleOutlined), label: "教学管理", roles: ["管理员", "教练"] },
-  { key: "/exam", icon: () => h(PlusOutlined), label: "报考管理", roles: ["管理员", "招生"] },
+  { key: "/exam", icon: () => h(PlusOutlined), label: "考场预约查询", roles: ["管理员", "招生"] },
   { key: "/map", icon: () => h(EnvironmentOutlined), label: "考场地图", roles: ["管理员", "招生", "教练", "学员", "ROLE_STUDENT"] },
   { key: "/reports", icon: () => h(BarChartOutlined), label: "报表中心", roles: ["管理员", "招生"] }
 ];

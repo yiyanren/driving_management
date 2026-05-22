@@ -20,16 +20,13 @@ public class ExamApplicationService {
     private final ExamApplicationRepository examApplicationRepository;
     private final StudentRepository studentRepository;
     private final ExamSiteRepository examSiteRepository;
-    private final ExamSiteService examSiteService;
 
     public ExamApplicationService(ExamApplicationRepository examApplicationRepository,
                                   StudentRepository studentRepository,
-                                  ExamSiteRepository examSiteRepository,
-                                  ExamSiteService examSiteService) {
+                                  ExamSiteRepository examSiteRepository) {
         this.examApplicationRepository = examApplicationRepository;
         this.studentRepository = studentRepository;
         this.examSiteRepository = examSiteRepository;
-        this.examSiteService = examSiteService;
     }
 
     public PageResult<ExamApplication> page(int page, int size, Long studentId, String status) {
@@ -61,7 +58,6 @@ public class ExamApplicationService {
         if (cap > 0 && used >= cap) {
             throw new IllegalArgumentException("考场场次容量已满");
         }
-        examSiteService.consumeScheduleCapacity(examApplication.getExamSiteId(), examApplication.getExamDate(), examApplication.getSubjectCode());
         site.setReservedCount(used + 1);
         examSiteRepository.save(site);
         if (!StringUtils.hasText(examApplication.getStatus())) {

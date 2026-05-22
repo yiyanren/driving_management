@@ -1,10 +1,10 @@
 <script setup>
-import { computed, onMounted, reactive, ref } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import { message } from "ant-design-vue";
 import { api } from "../api";
 
-const students = ref([]);
-const siteOptionsSource = ref([]);
+const queryUrl = "https://hb.122.gov.cn/web/html/?type=1&ticket=NIL&code=E_A_1023#/nView/exam/limitpub";
+
 const siteList = ref([]);
 const siteTotal = ref(0);
 const siteLoading = ref(false);
@@ -15,25 +15,12 @@ const importing = ref(false);
 const savingSite = ref(false);
 const siteModalVisible = ref(false);
 
-const examForm = reactive({
-  studentId: undefined,
-  subjectCode: "科目一",
-  examSiteId: undefined,
-  examDate: "",
-  status: "已申请"
-});
-
 const siteForm = reactive({
   name: "",
   subjectType: "",
   vehicleTypes: "",
   address: ""
 });
-
-const subjectOptions = ["科目一", "科目二", "科目三", "科目四"].map((item) => ({
-  label: item,
-  value: item
-}));
 
 const siteColumns = [
   { title: "考场名称", dataIndex: "name", key: "name" },
@@ -43,20 +30,6 @@ const siteColumns = [
   { title: "地址", dataIndex: "address", key: "address" }
 ];
 
-const studentOptions = computed(() =>
-  students.value.map((student) => ({
-    label: `${student.name} / ${student.phone}`,
-    value: student.id
-  }))
-);
-
-const siteOptions = computed(() =>
-  siteOptionsSource.value.map((site) => ({
-    label: `${site.name}${site.regionName ? ` / ${site.regionName}` : ""}`,
-    value: site.id
-  }))
-);
-
 const resetSiteForm = () => {
   Object.assign(siteForm, {
     name: "",
@@ -64,19 +37,6 @@ const resetSiteForm = () => {
     vehicleTypes: "",
     address: ""
   });
-};
-
-const loadBaseData = async () => {
-  const [studentRes, siteRes] = await Promise.all([
-    api.listStudents({ page: 0, size: 500 }),
-    api.listExamSites({ page: 0, size: 500 })
-  ]);
-  if (studentRes.data.success) {
-    students.value = studentRes.data.data.content || [];
-  }
-  if (siteRes.data.success) {
-    siteOptionsSource.value = siteRes.data.data.content || [];
-  }
 };
 
 const loadSiteList = async () => {
@@ -97,13 +57,19 @@ const loadSiteList = async () => {
   }
 };
 
-const refreshSiteData = async () => {
-  await Promise.all([loadBaseData(), loadSiteList()]);
-};
-
 const handleSearch = async () => {
   sitePage.value = 1;
   await loadSiteList();
+};
+
+const handleTableChange = async (page, size) => {
+  sitePage.value = page;
+  siteSize.value = size;
+  await loadSiteList();
+};
+
+const openQueryPage = () => {
+  window.open(queryUrl, "_blank");
 };
 
 const openAddSiteModal = () => {
@@ -132,7 +98,7 @@ const saveSite = async () => {
     message.success("考场新增成功");
     siteModalVisible.value = false;
     resetSiteForm();
-    await refreshSiteData();
+    await loadSiteList();
   } finally {
     savingSite.value = false;
   }
@@ -148,70 +114,28 @@ const importSites = async (file) => {
       return message.error(res.data.message || "导入失败");
     }
     message.success(`导入完成：新增 ${res.data.data.imported} 条，更新 ${res.data.data.updated} 条`);
-    await refreshSiteData();
+    await loadSiteList();
   } finally {
     importing.value = false;
   }
   return false;
 };
 
-const createExam = async () => {
-  if (!examForm.studentId) {
-    return message.warning("请选择学员（姓名 + 手机号）");
-  }
-  if (!examForm.examSiteId) {
-    return message.warning("请选择考场");
-  }
-  if (!examForm.examDate) {
-    return message.warning("请选择考试日期");
-  }
-  const payload = {
-    ...examForm,
-    studentId: Number(examForm.studentId),
-    examSiteId: Number(examForm.examSiteId)
-  };
-  const res = await api.createExamApplication(payload);
-  if (!res.data.success) {
-    return message.error(res.data.message || "创建失败");
-  }
-  message.success("报考申请提交成功");
-};
-
 onMounted(async () => {
-  await refreshSiteData();
+  await loadSiteList();
 });
 </script>
 
 <template>
   <div class="view-container">
-    <a-card title="报考申请" :bordered="false">
-      <a-row :gutter="[12, 12]">
-        <a-col :xs="24" :sm="12" :lg="6">
-          <a-select
-            v-model:value="examForm.studentId"
-            :options="studentOptions"
-            placeholder="学员姓名 + 手机号"
-            show-search
-            option-filter-prop="label"
-          />
-        </a-col>
-        <a-col :xs="24" :sm="12" :lg="6">
-          <a-select v-model:value="examForm.subjectCode" :options="subjectOptions" placeholder="考试科目" />
-        </a-col>
-        <a-col :xs="24" :sm="12" :lg="6">
-          <a-select
-            v-model:value="examForm.examSiteId"
-            :options="siteOptions"
-            placeholder="选择考场"
-            show-search
-            option-filter-prop="label"
-          />
-        </a-col>
-        <a-col :xs="24" :sm="12" :lg="6">
-          <a-date-picker style="width: 100%;" @change="(_, value) => examForm.examDate = value" />
-        </a-col>
-      </a-row>
-      <a-button style="margin-top: 12px;" type="primary" @click="createExam">提交报考</a-button>
+    <a-card title="考场预约查询" :bordered="false">
+      <div class="query-panel">
+        <div>
+          <div class="query-title">官方考试预约查询入口</div>
+          
+        </div>
+        <a-button type="primary" @click="openQueryPage">前往查询</a-button>
+      </div>
     </a-card>
 
     <a-card title="考场列表" class="table-card" :bordered="false">
@@ -232,7 +156,6 @@ onMounted(async () => {
         </a-space>
       </template>
 
-      <div class="table-tip">考场容量不再由系统手动定义，考场维护仅保留基础信息导入与新增。</div>
 
       <a-table
         :columns="siteColumns"
@@ -242,11 +165,7 @@ onMounted(async () => {
           current: sitePage,
           pageSize: siteSize,
           total: siteTotal,
-          onChange: (page, size) => {
-            sitePage = page;
-            siteSize = size;
-            loadSiteList();
-          }
+          onChange: handleTableChange
         }"
         row-key="id"
         bordered
@@ -300,9 +219,35 @@ onMounted(async () => {
   padding-top: 16px;
 }
 
+.query-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.query-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.query-description {
+  margin-top: 8px;
+  color: #595959;
+  line-height: 1.6;
+}
+
 .table-tip {
   margin-bottom: 12px;
   color: #8c8c8c;
   font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .query-panel {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 </style>

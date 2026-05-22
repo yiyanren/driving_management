@@ -248,7 +248,7 @@ onMounted(async () => {
         </a-col>
       </a-row>
     </a-card>
-    <a-card title="新增训练记录 (核销计划)">
+    <a-card title="新增训练记录">
       <a-row :gutter="12">
         <a-col :xs="24" :sm="12" :lg="5">
           <a-input v-model:value="recordForm.studentPhone" placeholder="输入学员手机号" @blur="onStudentPhoneChangeForRecord" @pressEnter="onStudentPhoneChangeForRecord" />

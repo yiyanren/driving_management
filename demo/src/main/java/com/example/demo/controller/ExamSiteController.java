@@ -3,11 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.common.ApiResponse;
 import com.example.demo.common.PageResult;
 import com.example.demo.aop.OpLog;
-import com.example.demo.dto.ExamSiteRealtimeDto;
-import com.example.demo.dto.ExamSiteScheduleRequest;
-import com.example.demo.dto.ExamSiteTrendPointDto;
 import com.example.demo.model.ExamSite;
-import com.example.demo.model.ExamSiteSchedule;
 import com.example.demo.service.ExamSiteService;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,8 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -52,44 +46,8 @@ public class ExamSiteController {
     @PostMapping("/import")
     @PreAuthorize("hasAnyRole('管理员','招生')")
     @OpLog(module = "考场", action = "导入真实考场")
-    public ApiResponse<Map<String, Object>> importExcel(@RequestParam("file") MultipartFile file,
-                                                        @RequestParam(defaultValue = "0") Integer defaultCapacity) throws IOException {
-        return ApiResponse.ok("导入成功", examSiteService.importExcel(file, defaultCapacity));
-    }
-
-    @PostMapping("/import-local")
-    @PreAuthorize("hasAnyRole('管理员','招生')")
-    @OpLog(module = "考场", action = "读取本地考场表")
-    public ApiResponse<Map<String, Object>> importLocalExcel(@RequestParam(defaultValue = "0") Integer defaultCapacity) throws IOException {
-        return ApiResponse.ok("读取成功", examSiteService.importLocalExcel(defaultCapacity));
-    }
-
-    @PostMapping("/schedules")
-    @PreAuthorize("hasAnyRole('管理员','招生')")
-    @OpLog(module = "考场", action = "维护考场日程")
-    public ApiResponse<ExamSiteSchedule> saveSchedule(@Valid @RequestBody ExamSiteScheduleRequest request) {
-        return ApiResponse.ok("保存成功", examSiteService.saveSchedule(request));
-    }
-
-    @GetMapping("/realtime")
-    @PreAuthorize("hasAnyRole('管理员','招生','教练','学员','STUDENT')")
-    public ApiResponse<PageResult<ExamSiteRealtimeDto>> realtime(@RequestParam(defaultValue = "0") int page,
-                                                                 @RequestParam(defaultValue = "10") int size,
-                                                                 @RequestParam(required = false) LocalDate examDate,
-                                                                 @RequestParam(required = false) String subjectCode,
-                                                                 @RequestParam(required = false) String regionName,
-                                                                 @RequestParam(required = false) String keyword,
-                                                                 @RequestParam(required = false) Boolean onlyAvailable) {
-        return ApiResponse.ok(examSiteService.realtimePage(page, size, examDate, subjectCode, regionName, keyword, onlyAvailable));
-    }
-
-    @GetMapping("/trend")
-    @PreAuthorize("hasAnyRole('管理员','招生','教练','学员','STUDENT')")
-    public ApiResponse<List<ExamSiteTrendPointDto>> trend(@RequestParam Long siteId,
-                                                          @RequestParam String subjectCode,
-                                                          @RequestParam(required = false) LocalDate from,
-                                                          @RequestParam(required = false) LocalDate to) {
-        return ApiResponse.ok(examSiteService.trend(siteId, subjectCode, from, to));
+    public ApiResponse<Map<String, Object>> importExcel(@RequestParam("file") MultipartFile file) throws IOException {
+        return ApiResponse.ok("导入成功", examSiteService.importExcel(file));
     }
 
     @PutMapping("/{id}")
