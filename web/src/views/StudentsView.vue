@@ -3,6 +3,8 @@ import { computed, onMounted, reactive, ref } from "vue";
 import { message } from "ant-design-vue";
 import { api } from "../api";
 
+const LICENSE_TYPE_OPTIONS = ["A1", "A2", "A3", "B1", "B2", "C1", "C2", "C5", "D", "E", "F", "M", "N", "P"];
+
 const loading = ref(false);
 const list = ref([]);
 const total = ref(0);
@@ -17,6 +19,7 @@ const editForm = reactive({
   idCard: "",
   status: "",
   drivingSchoolId: undefined,
+  licenseType: undefined,
   subjectOnePassed: false,
   subjectTwoPassed: false,
   subjectThreePassed: false,
@@ -33,7 +36,8 @@ const addForm = reactive({
   source: "",
   owner: "",
   idCard: "",
-  drivingSchoolId: undefined
+  drivingSchoolId: undefined,
+  licenseType: undefined
 });
 const unconvertedLeads = ref([]);
 const schools = ref([]);
@@ -50,6 +54,7 @@ const columns = [
   { title: "手机号", dataIndex: "phone", key: "phone" },
   { title: "身份证", dataIndex: "idCard", key: "idCard" },
   { title: "所属驾校", dataIndex: "schoolName", key: "schoolName" },
+  { title: "报名类型", dataIndex: "licenseType", key: "licenseType" },
   { title: "状态", dataIndex: "status", key: "status" },
   { title: "操作", key: "action", width: 180 }
 ];
@@ -101,7 +106,7 @@ const loadUnconvertedLeads = async () => {
 
 const openAdd = async () => {
   addType.value = "convert";
-  Object.assign(addForm, { leadId: undefined, name: "", phone: "", source: "", owner: "", idCard: "" });
+  Object.assign(addForm, { leadId: undefined, name: "", phone: "", source: "", owner: "", idCard: "", drivingSchoolId: undefined, licenseType: undefined });
   await loadUnconvertedLeads();
   addVisible.value = true;
 };
@@ -150,6 +155,12 @@ const submitAdd = async () => {
        const studentId = convertRes.data.data.id;
        const studentData = convertRes.data.data;
        studentData.drivingSchoolId = addForm.drivingSchoolId;
+       studentData.licenseType = addForm.licenseType;
+       await api.updateStudent(studentId, studentData);
+    } else if (addForm.licenseType) {
+       const studentId = convertRes.data.data.id;
+       const studentData = convertRes.data.data;
+       studentData.licenseType = addForm.licenseType;
        await api.updateStudent(studentId, studentData);
     }
 
@@ -170,6 +181,7 @@ const applyEditForm = (student) => {
   editForm.idCard = student.idCard;
   editForm.status = student.status;
   editForm.drivingSchoolId = student.drivingSchoolId;
+  editForm.licenseType = student.licenseType;
   editForm.subjectOnePassed = Boolean(student.subjectOnePassed);
   editForm.subjectTwoPassed = Boolean(student.subjectTwoPassed);
   editForm.subjectThreePassed = Boolean(student.subjectThreePassed);
@@ -201,6 +213,7 @@ const submitEdit = async () => {
       idCard: editForm.idCard,
       status: editForm.status,
       drivingSchoolId: editForm.drivingSchoolId,
+      licenseType: editForm.licenseType,
       subjectOnePassed: editForm.subjectOnePassed,
       subjectTwoPassed: editForm.subjectTwoPassed,
       subjectThreePassed: editForm.subjectThreePassed,
@@ -294,6 +307,12 @@ onMounted(() => {
           :options="schools.map(s => ({ label: s.name, value: s.id }))"
           allowClear
         />
+        <a-select
+          v-model:value="editForm.licenseType"
+          placeholder="请选择报名类型"
+          :options="LICENSE_TYPE_OPTIONS.map(item => ({ label: item, value: item }))"
+          allow-clear
+        />
         <a-card size="small" title="考试科目进度">
           <a-space direction="vertical" style="display:flex;">
             <a-checkbox v-model:checked="editForm.subjectOnePassed" :disabled="subjectCheckboxDisabled.subjectOnePassed">科目一</a-checkbox>
@@ -330,6 +349,12 @@ onMounted(() => {
               :options="schools.map(s => ({ label: s.name, value: s.id }))"
               allowClear
             />
+            <a-select
+              v-model:value="addForm.licenseType"
+              placeholder="请选择报名类型"
+              :options="LICENSE_TYPE_OPTIONS.map(item => ({ label: item, value: item }))"
+              allow-clear
+            />
           </a-space>
         </a-tab-pane>
         <a-tab-pane key="direct" tab="直接新增学员">
@@ -347,6 +372,12 @@ onMounted(() => {
               option-filter-prop="label"
               :options="schools.map(s => ({ label: s.name, value: s.id }))"
               allowClear
+            />
+            <a-select
+              v-model:value="addForm.licenseType"
+              placeholder="请选择报名类型"
+              :options="LICENSE_TYPE_OPTIONS.map(item => ({ label: item, value: item }))"
+              allow-clear
             />
           </a-space>
         </a-tab-pane>

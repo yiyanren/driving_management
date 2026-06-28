@@ -40,9 +40,9 @@ body {
   height: 64px;
   line-height: 64px;
   padding: 0 20px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(6px);
-  border-bottom: 1px solid #eff1f6;
+  background: #ffffff;
+  border-bottom: 1px solid #e8edf5;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -51,6 +51,11 @@ body {
 .header-title {
   font-size: 18px;
   font-weight: 600;
+  color: #f3f4f6;
+}
+
+.top-header .ant-space {
+  color: #e0e2e7;
 }
 
 .content-wrap {

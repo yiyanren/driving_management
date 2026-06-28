@@ -19,7 +19,7 @@ public class QuestionController {
     private final RestTemplate restTemplate = new RestTemplate();
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('学员', '管理员', '教练')")
+    @PreAuthorize("hasAnyRole('学员', 'STUDENT', '管理员', '教练')")
     public ApiResponse<Object> getQuestions(@RequestParam int subject, 
                                             @RequestParam(defaultValue = "c1") String model, 
                                             @RequestParam(defaultValue = "rand") String testType) {

@@ -65,9 +65,10 @@ public class StudentController {
     @PostMapping("/me/enroll")
     @PreAuthorize("hasAnyRole('学员','STUDENT')")
     @OpLog(module = "学员", action = "提交报名")
-    public ApiResponse<Student> enroll(@RequestParam Long drivingSchoolId) {
+    public ApiResponse<Student> enroll(@RequestParam Long drivingSchoolId,
+                                       @RequestParam String licenseType) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return ApiResponse.ok("报名成功", studentService.enroll(auth.getName(), drivingSchoolId));
+        return ApiResponse.ok("报名成功", studentService.enroll(auth.getName(), drivingSchoolId, licenseType));
     }
 
     @PostMapping
@@ -78,7 +79,7 @@ public class StudentController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('管理员','招生')")
+    @PreAuthorize("hasAnyRole('管理员','招生','教练')")
     @OpLog(module = "学员", action = "更新学员")
     public ApiResponse<Student> update(@PathVariable Long id, @Valid @RequestBody Student payload) {
         return ApiResponse.ok("更新成功", studentService.update(id, payload));

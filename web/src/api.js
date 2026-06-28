@@ -39,7 +39,7 @@ export const api = {
   updateMyPassword: (data) => http.put("/users/me/password", data),
   getStudentMe: () => http.get("/students/me"),
   updateStudentMe: (data) => http.put("/students/me", data),
-  submitStudentEnrollment: (drivingSchoolId) => http.post("/students/me/enroll", null, { params: { drivingSchoolId } }),
+  submitStudentEnrollment: (drivingSchoolId, licenseType) => http.post("/students/me/enroll", null, { params: { drivingSchoolId, licenseType } }),
   listEnrollmentRecords: (params) => http.get("/students/enrollments", { params }),
 
   listDrivingSchools: (params) => http.get("/driving-schools", { params }),

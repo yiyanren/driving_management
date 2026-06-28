@@ -7,7 +7,12 @@ import { useAuthStore } from "../stores/auth";
 const auth = useAuthStore();
 const isStudent = computed(() => auth.role === "学员" || auth.role === "ROLE_STUDENT");
 const isCoach = computed(() => auth.role === "教练");
-const studentHasEnrollment = computed(() => studentProfile.value?.status === "已报名" && !!studentProfile.value?.drivingSchoolId);
+const LICENSE_TYPE_OPTIONS = ["A1", "A2", "A3", "B1", "B2", "C1", "C2", "C5", "D", "E", "F", "M", "N", "P"];
+const studentHasEnrollment = computed(() => (
+  studentProfile.value?.status === "已报名"
+  && !!studentProfile.value?.drivingSchoolId
+  && !!studentProfile.value?.licenseType
+));
 
 const schools = ref([]);
 const currentUser = ref(null);
@@ -16,6 +21,7 @@ const profileLoading = ref(false);
 const submitLoading = ref(false);
 const studentProfile = ref(null);
 const selectedSchoolId = ref(undefined);
+const selectedLicenseType = ref(undefined);
 
 const recordsLoading = ref(false);
 const records = ref([]);
@@ -32,10 +38,12 @@ const columns = [
   { title: "手机号", dataIndex: "phone", key: "phone" },
   { title: "身份证", dataIndex: "idCard", key: "idCard" },
   { title: "所属驾校", dataIndex: "schoolName", key: "schoolName" },
+  { title: "报名类型", dataIndex: "licenseType", key: "licenseType" },
   { title: "报名状态", dataIndex: "status", key: "status" }
 ];
 
 const schoolOptions = computed(() => schools.value.map((item) => ({ label: item.name, value: item.id })));
+const licenseTypeOptions = LICENSE_TYPE_OPTIONS.map((item) => ({ label: item, value: item }));
 
 const getSchoolName = (drivingSchoolId) => {
   const school = schools.value.find((item) => item.id === drivingSchoolId);
@@ -71,6 +79,7 @@ const loadStudentProfile = async () => {
     if (res.data.success) {
       studentProfile.value = res.data.data;
       selectedSchoolId.value = res.data.data.drivingSchoolId;
+      selectedLicenseType.value = res.data.data.licenseType;
     }
   } catch (e) {
     message.error(e?.response?.data?.message || "获取报名信息失败");
@@ -83,9 +92,12 @@ const submitEnrollment = async () => {
   if (!selectedSchoolId.value) {
     return message.warning("请选择报名驾校");
   }
+  if (!selectedLicenseType.value) {
+    return message.warning("请选择报名类型");
+  }
   submitLoading.value = true;
   try {
-    const res = await api.submitStudentEnrollment(selectedSchoolId.value);
+    const res = await api.submitStudentEnrollment(selectedSchoolId.value, selectedLicenseType.value);
     if (!res.data.success) {
       return message.error(res.data.message || "报名失败");
     }
@@ -157,7 +169,7 @@ onMounted(async () => {
           <a-alert
             :type="studentHasEnrollment ? 'success' : 'info'"
             show-icon
-            :message="studentHasEnrollment ? '当前账号已完成报名' : '当前账号尚未报名，请先选择驾校完成报名'"
+            :message="studentHasEnrollment ? '当前账号已完成报名' : '当前账号尚未报名或报名信息不完整，请先补全驾校和报名类型'"
             style="margin-bottom: 16px;"
           />
           <a-descriptions bordered :column="1">
@@ -167,6 +179,7 @@ onMounted(async () => {
               <a-tag :color="studentHasEnrollment ? 'green' : 'orange'">{{ studentHasEnrollment ? "已报名" : "未报名" }}</a-tag>
             </a-descriptions-item>
             <a-descriptions-item label="所属驾校">{{ getSchoolName(studentProfile.drivingSchoolId) }}</a-descriptions-item>
+            <a-descriptions-item label="报名类型">{{ studentProfile.licenseType || "未选择" }}</a-descriptions-item>
           </a-descriptions>
 
           <a-card v-if="!studentHasEnrollment" size="small" style="margin-top: 16px;">
@@ -177,6 +190,11 @@ onMounted(async () => {
                 show-search
                 option-filter-prop="label"
                 :options="schoolOptions"
+              />
+              <a-select
+                v-model:value="selectedLicenseType"
+                placeholder="请选择报名类型"
+                :options="licenseTypeOptions"
               />
               <a-button type="primary" :loading="submitLoading" @click="submitEnrollment">确认报名</a-button>
             </a-space>

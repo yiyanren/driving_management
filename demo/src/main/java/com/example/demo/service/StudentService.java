@@ -20,8 +20,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.Set;
+
 @Service
 public class StudentService {
+    private static final Set<String> SUPPORTED_LICENSE_TYPES = Set.of("A1", "A2", "A3", "B1", "B2", "C1", "C2", "C5", "D", "E", "F", "M", "N", "P");
+
     private final StudentRepository studentRepository;
     private final UserRepository userRepository;
     private final DrivingSchoolRepository drivingSchoolRepository;
@@ -107,6 +111,7 @@ public class StudentService {
         if (!StringUtils.hasText(student.getStatus())) {
             student.setStatus("已报名");
         }
+        student.setLicenseType(normalizeLicenseType(student.getLicenseType(), false));
         applySubjectProgress(student, student);
         
         // Auto-generate account logic
@@ -153,6 +158,9 @@ public class StudentService {
         if (payload.getDrivingSchoolId() != null) {
             student.setDrivingSchoolId(payload.getDrivingSchoolId());
         }
+        if (payload.getLicenseType() != null) {
+            student.setLicenseType(normalizeLicenseType(payload.getLicenseType(), false));
+        }
         applySubjectProgress(student, payload);
         
         if (student.getUserId() != null) {
@@ -176,19 +184,23 @@ public class StudentService {
         return studentRepository.save(student);
     }
 
-    public Student enroll(String username, Long drivingSchoolId) {
+    public Student enroll(String username, Long drivingSchoolId, String licenseType) {
         if (drivingSchoolId == null) {
             throw new IllegalArgumentException("请选择报名驾校");
         }
+        String normalizedLicenseType = normalizeLicenseType(licenseType, true);
         DrivingSchool drivingSchool = drivingSchoolRepository.findById(drivingSchoolId)
                 .orElseThrow(() -> new ResourceNotFoundException("驾校不存在"));
         Student student = getByUsername(username);
-        if ("已报名".equals(student.getStatus()) && student.getDrivingSchoolId() != null) {
+        if ("已报名".equals(student.getStatus())
+                && student.getDrivingSchoolId() != null
+                && StringUtils.hasText(student.getLicenseType())) {
             throw new IllegalArgumentException("您已完成报名，无需重复提交");
         }
 
         student.setStatus("已报名");
         student.setDrivingSchoolId(drivingSchool.getId());
+        student.setLicenseType(normalizedLicenseType);
         Student savedStudent = studentRepository.save(student);
 
         if (savedStudent.getUserId() != null) {
@@ -244,6 +256,20 @@ public class StudentService {
 
     private String resolveInitialStatus(Long drivingSchoolId) {
         return drivingSchoolId == null ? "未报名" : "已报名";
+    }
+
+    private String normalizeLicenseType(String licenseType, boolean required) {
+        if (!StringUtils.hasText(licenseType)) {
+            if (required) {
+                throw new IllegalArgumentException("请选择报名类型");
+            }
+            return null;
+        }
+        String normalized = licenseType.trim().toUpperCase();
+        if (!SUPPORTED_LICENSE_TYPES.contains(normalized)) {
+            throw new IllegalArgumentException("报名类型不支持，请重新选择");
+        }
+        return normalized;
     }
 
     private String generatePlaceholderPhone(Long userId) {

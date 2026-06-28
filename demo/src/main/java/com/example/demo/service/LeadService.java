@@ -80,6 +80,7 @@ public class LeadService {
         student.setPhone(lead.getPhone());
         student.setIdCard(idCard);
         student.setStatus("已报名");
+        student.setLicenseType(null);
         lead.setStatus("已转学员");
         leadRepository.save(lead);
         return studentRepository.save(student);

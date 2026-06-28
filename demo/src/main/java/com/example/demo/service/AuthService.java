@@ -72,6 +72,7 @@ public class AuthService {
         student.setIdCard(req.getIdCard());
         student.setStatus("未报名");
         student.setDrivingSchoolId(null);
+        student.setLicenseType(null);
         studentRepository.save(student);
     }
 
@@ -100,6 +101,7 @@ public class AuthService {
             student.setIdCard(idCard);
             student.setStatus(status);
             student.setDrivingSchoolId(user.getDrivingSchoolId());
+            student.setLicenseType(null);
             studentRepository.save(student);
         });
     }

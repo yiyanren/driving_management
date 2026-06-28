@@ -33,6 +33,8 @@ public class Student {
 
     private Long drivingSchoolId;
 
+    private String licenseType;
+
     private Long userId;
 
     private LocalDateTime createdAt;
@@ -135,6 +137,14 @@ public class Student {
 
     public void setDrivingSchoolId(Long drivingSchoolId) {
         this.drivingSchoolId = drivingSchoolId;
+    }
+
+    public String getLicenseType() {
+        return licenseType;
+    }
+
+    public void setLicenseType(String licenseType) {
+        this.licenseType = licenseType;
     }
 
     public Long getUserId() {
